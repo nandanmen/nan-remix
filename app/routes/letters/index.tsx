@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useLoaderData } from "remix";
+import { Link, useLoaderData, json } from "remix";
 import { HiArrowRight, HiCheck } from "react-icons/hi";
 import { ImSpinner8 } from "react-icons/im";
 import { motion } from "framer-motion";
@@ -9,8 +9,16 @@ import { styled } from "~/stitches.config";
 import { getAllLetters, Letter } from "~/lib/newsletter";
 import { formatDate } from "~/lib/date";
 
-export const loader = () => {
-  return getAllLetters();
+const ONE_DAY = 60 * 60 * 24;
+const ONE_MONTH = ONE_DAY * 30;
+
+export const loader = async () => {
+  const letters = await getAllLetters();
+  return json(letters, {
+    headers: {
+      "Cache-Control": `max-age=${ONE_MONTH} stale-while-revalidate=${ONE_DAY}`,
+    },
+  });
 };
 
 export const meta = () => {
