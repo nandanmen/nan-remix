@@ -1,4 +1,4 @@
-import { useLoaderData, Link } from "remix";
+import { useLoaderData, Link, json } from "remix";
 import type { LoaderFunction, MetaFunction } from "remix";
 import { HiArrowLeft } from "react-icons/hi";
 import { motion } from "framer-motion";
@@ -9,7 +9,7 @@ import {
   processLetterAsHtml,
   Letter,
 } from "~/lib/newsletter";
-import { formatDate } from "~/lib/date";
+import { formatDate, ONE_WEEK, ONE_DAY, ONE_HOUR } from "~/lib/date";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const letter = await getLetterFromSlug(params.slug as string);
@@ -20,7 +20,11 @@ export const loader: LoaderFunction = async ({ params }) => {
     });
   }
 
-  return processLetterAsHtml(letter);
+  return json(processLetterAsHtml(letter), {
+    headers: {
+      "cache-control": `public, max-age=${ONE_HOUR}, stale-while-revalidate=${ONE_DAY}`,
+    },
+  });
 };
 
 export const meta: MetaFunction = ({ data }) => {

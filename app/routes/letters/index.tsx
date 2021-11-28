@@ -7,16 +7,13 @@ import { blue, green } from "@radix-ui/colors";
 
 import { styled } from "~/stitches.config";
 import { getAllLetters, Letter } from "~/lib/newsletter";
-import { formatDate } from "~/lib/date";
-
-const ONE_DAY = 60 * 60 * 24;
-const ONE_MONTH = ONE_DAY * 30;
+import { formatDate, ONE_WEEK, ONE_DAY } from "~/lib/date";
 
 export const loader = async () => {
   const letters = await getAllLetters();
   return json(letters, {
     headers: {
-      "Cache-Control": `max-age=${ONE_MONTH} stale-while-revalidate=${ONE_DAY}`,
+      "cache-control": `public, max-age=${ONE_WEEK}, stale-while-revalidate=${ONE_DAY}`,
     },
   });
 };
