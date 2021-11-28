@@ -7,6 +7,7 @@ import { blue, green } from "@radix-ui/colors";
 
 import { styled } from "~/stitches.config";
 import { getAllLetters, Letter } from "~/lib/newsletter";
+import { formatDate } from "~/lib/date";
 
 export const loader = () => {
   return getAllLetters();
@@ -170,13 +171,7 @@ type LetterLinkProps = {
 function LetterLink({ title, date = new Date(), slug }: LetterLinkProps) {
   return (
     <LetterWrapper>
-      <LetterDate>
-        {new Intl.DateTimeFormat("en-US", {
-          month: "long",
-          year: "numeric",
-          day: "numeric",
-        }).format(date)}
-      </LetterDate>
+      <LetterDate>{formatDate(date)}</LetterDate>
       <LetterTitle to={slug}>
         {title}{" "}
         <span>

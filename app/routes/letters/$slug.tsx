@@ -9,6 +9,7 @@ import {
   processLetterAsHtml,
   Letter,
 } from "~/lib/newsletter";
+import { formatDate } from "~/lib/date";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const letter = await getLetterFromSlug(params.slug as string);
@@ -38,13 +39,7 @@ export default function Letter() {
         </motion.span>{" "}
         Letters
       </LetterLink>
-      <DateWrapper>
-        {new Intl.DateTimeFormat("en-US", {
-          month: "long",
-          year: "numeric",
-          day: "numeric",
-        }).format(new Date(letter.publish_date))}
-      </DateWrapper>
+      <DateWrapper>{formatDate(new Date(letter.publish_date))}</DateWrapper>
       <Title>{letter.subject}</Title>
       <Article dangerouslySetInnerHTML={{ __html: letter.body }} />
     </Page>
