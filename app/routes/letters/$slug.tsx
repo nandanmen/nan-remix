@@ -9,7 +9,7 @@ import {
   processLetterAsHtml,
   Letter,
 } from "~/lib/newsletter";
-import { formatDate, ONE_WEEK, ONE_DAY, ONE_HOUR } from "~/lib/date";
+import { formatDate, ONE_DAY, ONE_HOUR } from "~/lib/date";
 
 export const loader: LoaderFunction = async ({ params }) => {
   const letter = await getLetterFromSlug(params.slug as string);
@@ -129,7 +129,7 @@ const Article = styled("article", {
 
   "> pre": {
     maxWidth: "calc(100% + $space$16)",
-    overflowX: "scroll",
+    overflowX: "auto",
     background: "$white",
     padding: "$8",
     borderRadius: "8px",

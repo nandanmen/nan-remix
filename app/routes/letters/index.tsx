@@ -1,12 +1,20 @@
 import React from "react";
-import { Link, useLoaderData, json } from "remix";
+import {
+  Link,
+  useLoaderData,
+  json,
+  Form,
+  useTransition,
+  useActionData,
+} from "remix";
+import type { ActionFunction } from "remix";
 import { HiArrowRight, HiCheck } from "react-icons/hi";
 import { ImSpinner8 } from "react-icons/im";
 import { motion } from "framer-motion";
 import { blue, green } from "@radix-ui/colors";
 
 import { styled } from "~/stitches.config";
-import { getAllLetters, Letter } from "~/lib/newsletter";
+import { getAllLetters, Letter, subscribe } from "~/lib/newsletter";
 import { formatDate, ONE_WEEK, ONE_DAY } from "~/lib/date";
 
 export const loader = async () => {
@@ -18,6 +26,13 @@ export const loader = async () => {
   });
 };
 
+export const action: ActionFunction = async ({ request }) => {
+  const formData = await request.formData();
+  const email = formData.get("email");
+  await subscribe(email as string);
+  return true;
+};
+
 export const meta = () => {
   return {
     title: "NaN | Letters",
@@ -27,7 +42,8 @@ export const meta = () => {
 export default function Letters() {
   const [isSubscribeInputOpen, setIsSubscribeInputOpen] = React.useState(false);
   const letters = useLoaderData();
-  const formState: string = "idle";
+  const transition = useTransition();
+  const success = useActionData();
 
   return (
     <Page>
@@ -41,39 +57,47 @@ export default function Letters() {
           now to get these letters sent straight to your inbox.
         </Blurb>
         {isSubscribeInputOpen && (
-          <SubscriptionBox
-            animate={{ y: 0, opacity: 1 }}
-            initial={{ y: -8, opacity: 0 }}
-          >
-            <EmailInput
-              name="email"
-              type="email"
-              placeholder="john.doe@email.com"
-            />
-            <SubmitButton
-              variants={{
-                loading: {
-                  scale: 0.8,
-                },
-              }}
-              animate={formState}
-              whileTap="loading"
-              done={formState === "done"}
+          <>
+            <SubscriptionBox
+              method="post"
+              animate={{ y: 0, opacity: 1 }}
+              initial={{ y: -8, opacity: 0 }}
             >
-              {formState === "idle" ? (
-                <HiArrowRight size="1.5em" />
-              ) : formState === "loading" ? (
-                <motion.span
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                >
-                  <ImSpinner8 size="1.2em" />
-                </motion.span>
-              ) : (
-                <HiCheck size="1.5em" />
-              )}
-            </SubmitButton>
-          </SubscriptionBox>
+              <EmailInput
+                name="email"
+                type="email"
+                placeholder="john.doe@email.com"
+              />
+              <SubmitButton
+                variants={{
+                  submitting: {
+                    scale: 0.8,
+                  },
+                }}
+                animate={transition.state}
+                whileTap="loading"
+                done={success}
+              >
+                {success ? (
+                  <HiCheck size="1.5em" />
+                ) : transition.state === "submitting" ? (
+                  <motion.span
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity }}
+                  >
+                    <ImSpinner8 size="1.2em" />
+                  </motion.span>
+                ) : (
+                  <HiArrowRight size="1.5em" />
+                )}
+              </SubmitButton>
+            </SubscriptionBox>
+            {success ? (
+              <ConfirmText>
+                Thanks! an email was sent to your inbox.
+              </ConfirmText>
+            ) : null}
+          </>
         )}
       </Header>
       <List layout>
@@ -90,6 +114,12 @@ export default function Letters() {
   );
 }
 
+const ConfirmText = styled("p", {
+  color: "$grey600",
+  marginTop: "$4",
+  fontFamily: "$mono",
+});
+
 const SubscribeLink = styled("button", {
   color: blue.blue10,
   fontFamily: "$serif",
@@ -97,7 +127,7 @@ const SubscribeLink = styled("button", {
   fontWeight: 600,
 });
 
-const SubscriptionBox = styled(motion.form, {
+const SubscriptionBox = styled(motion(Form), {
   marginTop: "$4",
   display: "flex",
   gap: "$2",
