@@ -52,6 +52,7 @@ export default function Letter() {
 
 const DateWrapper = styled("p", {
   color: "$grey600",
+  fontFamily: "$mono",
   marginTop: "$16",
   marginBottom: "$4",
 });
@@ -114,10 +115,11 @@ const Article = styled("article", {
   },
 
   code: {
-    background: "$white",
+    background: "$grey200",
     fontSize: "$sm",
     padding: "$1",
     borderRadius: 4,
+    fontFamily: "$mono",
   },
 
   "> h2": {
@@ -132,16 +134,31 @@ const Article = styled("article", {
     overflowX: "auto",
     background: "$white",
     padding: "$8",
-    borderRadius: "8px",
-    margin: "$10 -$8",
-    marginBottom: "$10 !important",
-    border: "2px solid $grey600",
+    margin: "$12 -$8",
+    marginBottom: "$12 !important",
+    border: "2px solid $black",
+    borderLeft: "none",
+    borderRight: "none",
+
+    "@md": {
+      borderRadius: 4,
+      borderLeft: "2px solid $black",
+      borderRight: "2px solid $black",
+    },
+
+    code: {
+      background: "transparent",
+    },
   },
 
   "> p > img": {
-    marginTop: "$10",
-    marginBottom: "$10 !important",
-    borderRadius: 8,
+    maxWidth: "calc(100% + $space$16)",
+    margin: "$12 -$8",
+    marginBottom: "$12 !important",
+
+    "@md": {
+      borderRadius: 4,
+    },
   },
 
   "> hr": {
